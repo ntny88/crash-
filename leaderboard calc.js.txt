@@ -1,0 +1,5 @@
+const winnings = bet.amount * bet.multiplier;
+app.get('/api/leaderboard', (req, res) => {
+  const leaderboard = getTopPlayers();
+  res.json(leaderboard);
+});

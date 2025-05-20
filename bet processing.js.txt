@@ -1,0 +1,2 @@
+await contract.methods.placeBet(accounts[0], betAmount).send({ from: accounts[0] });
+const winnings = bet.amount * bet.multiplier;

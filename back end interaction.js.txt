@@ -1,0 +1,5 @@
+fetch('/api/bet', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ player: accounts[0], amount: betAmount })
+});

@@ -1,0 +1,5 @@
+const contractAddress = '0xYourContractAddress';
+const abi = [ /* ABI Array */ ];
+const contract = new web3.eth.Contract(abi, contractAddress);
+
+await contract.methods.placeBet(accounts[0], betAmount).send({ from: accounts[0] });

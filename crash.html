@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Crash Game</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #121212;
+      color: white;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+    }
+    #graph {
+      height: 300px;
+      width: 100%;
+      background: #1e1e1e;
+      margin-top: 20px;
+    }
+    #controls, #leaderboard, #wallet {
+      margin-top: 20px;
+    }
+    #multiplier {
+      font-size: 48px;
+      margin-top: 20px;
+    }
+    input, button {
+      padding: 10px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    #leaderboard {
+      margin-top: 40px;
+      border-top: 1px solid #333;
+      padding-top: 20px;
+    }
+    table {
+      margin: auto;
+      width: 80%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #444;
+    }
+    th {
+      background-color: #222;
+    }
+    #walletAddress {
+      color: #00ffcc;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚀 Crash Game</h1>
+
+  <div id="wallet">
+    <button onclick="connectWallet()">🔗 Connect Wallet</button>
+    <div id="walletAddress"></div>
+  </div>
+
+  <div id="multiplier">1.00x</div>
+  <canvas id="graph" width="600" height="300"></canvas>
+
+  <div id="controls">
+    <input type="number" id="betAmount" placeholder="Bet Amount" />
+    <input type="number" id="autoCashout" placeholder="Auto Cashout" step="0.01" />
+    <button onclick="placeBet()">Place Bet</button>
+  </div>
+
+  <div id="leaderboard">
+    <h2>🏆 Leaderboard</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Player</th>
+          <th>Cashout</th>
+          <th>Win</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody">
+        <tr><td>0xA1...B3</td><td>2.3x</td><td>0.046 ETH</td></tr>
+        <tr><td>0xC4...D5</td><td>3.1x</td><td>0.092 ETH</td></tr>
+        <tr><td>0xE6...F7</td><td>5.0x</td><td>0.25 ETH</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    // Game Logic
+    let multiplier = 1.00;
+    let isCrashed = false;
+
+    const multiplierEl = document.getElementById("multiplier");
+    const canvas = document.getElementById("graph");
+    const ctx = canvas.getContext("2d");
+
+    function startGame() {
+      multiplier = 1.00;
+      isCrashed = false;
+      let startTime = Date.now();
+
+      function update() {
+        if (isCrashed) return;
+        let elapsed = (Date.now() - startTime) / 1000;
+        multiplier = parseFloat((1.0024 ** (elapsed * 100)).toFixed(2));
+        multiplierEl.textContent = multiplier.toFixed(2) + "x";
+
+        if (Math.random() < 0.005 + (multiplier / 100)) {
+          isCrashed = true;
+          multiplierEl.textContent += " 💥 Crashed!";
+        }
+
+        drawGraph(multiplier);
+
+        if (!isCrashed) requestAnimationFrame(update);
+      }
+
+      update();
+    }
+
+    function drawGraph(mult) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "lime";
+      ctx.fillRect(0, canvas.height - mult * 5, canvas.width, 2);
+    }
+
+    function placeBet() {
+      alert("Bet placed! Auto cashout at: " + document.getElementById("autoCashout").value + "x");
+    }
+
+    startGame();
+
+    // Wallet Integration
+    async function connectWallet() {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+          const address = accounts[0];
+          document.getElementById("walletAddress").textContent = "Connected: " + shortenAddress(address);
+        } catch (err) {
+          alert("Wallet connection failed.");
+        }
+      } else {
+        alert("MetaMask not detected. Please install it.");
+      }
+    }
+
+    function shortenAddress(addr) {
+      return addr.slice(0, 6) + '...' + addr.slice(-4);
+    }
+  </script>
+
+</body>
+</html>
